@@ -5,7 +5,7 @@ import re
 from setuptools import setup
 
 
-INSTALL_REQUIRES = ["numpy", "scipy", "scikit-learn", "torch", "tqdm"]
+INSTALL_REQUIRES = ["numpy", "scipy", "scikit-learn", "tqdm"]#and torch
 
 SETUP_REQUIRES = ["pytest-runner"]
 
