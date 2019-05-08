@@ -15,11 +15,11 @@ DEV_REQUIRES = TEST_REQUIRES + ["sphinx", "sphinx_rtd_theme", "black"]
 
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, "README.rst")) as f:
+with open(os.path.join(here, "README.rst"),encoding='UTF-8') as f:
     long_description = f.read()
 
 
-with open(os.path.join(here, "mia/__init__.py")) as f:
+with open(os.path.join(here, "mia/__init__.py"),encoding='UTF-8') as f:
     matches = re.findall(r"(__.+__) = \"(.*)\"", f.read())
     for var_name, var_value in matches:
         globals()[var_name] = var_value
