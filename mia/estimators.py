@@ -142,7 +142,6 @@ class ShadowModelBundle(sklearn.base.BaseEstimator):
         )
 
         for i in model_index_iter:
-            print("i=",i)
             shadow_model = self._get_model(i)
             train_indices = self.shadow_train_indices_[i]
             test_indices = self.shadow_test_indices_[i]
