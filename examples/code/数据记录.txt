@@ -1,0 +1,20 @@
+观察epoch的影响
+epoch=12  0.558375
+epoch 都调为50            0.567625
+epoch 都调为300          0.648625
+结论：target model训练越丰富，overfit情况越强，攻击效果越好
+观察 shadow num的影响
+epoch=50 shadow=3  0.567625
+epoch=50 shadow=10  0.59025
+结论：shadow model数量对性能有显著提升，运行时间与性能的折中
+训练数据量
+epoch = 50 shadow = 10 num=45000  0.59025
+epoch = 50 shadow = 10 num=25000  0.640625
+结论：还没搞清楚
+训练网络改变
+basic CNN for cifar10 epoch = 50 shadow = 10 num=25000  0.640625
+cifar10_cnn_capsule epoch = 50 shadow = 10 num=25000 还没调好
+训练数据集改变（这里主要指类别数） cifar10-- cifar100
+cifar10 epoch = 50 shadow = 10 num=25000  0.640625
+cifar100 epoch = 50 shadow = 10 num=25000  0.713
+结论：更多类别产生更多信息方便攻击
