@@ -102,7 +102,7 @@ class Capsule(layers.Layer):
             self.activation = activations.get(activation)
 
     def build(self, input_shape):
-        input_dim_capsule = input_shape[-1]
+        input_dim_capsule = int(input_shape[-1])
         if self.share_weights:
             self.kernel = self.add_weight(
                 name='capsule_kernel',
@@ -111,7 +111,7 @@ class Capsule(layers.Layer):
                 initializer='glorot_uniform',
                 trainable=True)
         else:
-            input_num_capsule = input_shape[-2]
+            input_num_capsule = int(input_shape[-2])
             self.kernel = self.add_weight(
                 name='capsule_kernel',
                 shape=(input_num_capsule, input_dim_capsule,
