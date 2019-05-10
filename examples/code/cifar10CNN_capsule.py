@@ -135,8 +135,8 @@ class Capsule(layers.Layer):
         else:
             hat_inputs = K.local_conv1d(inputs, self.kernel, [1], [1])
 
-        batch_size = K.int_shape(inputs)[0]
-        input_num_capsule = K.int_shape(inputs)[1]
+        batch_size = K.shape(inputs)[0]
+        input_num_capsule = K.shape(inputs)[1]
         hat_inputs = K.reshape(hat_inputs,
                                (batch_size, input_num_capsule,
                                 self.num_capsule, self.dim_capsule))
