@@ -72,3 +72,4 @@ ENV/
 # Temp files
 __*
 !__init__.py
+examples/code/cifar10CNN_capsule.py
