@@ -12,7 +12,10 @@ from tensorflow.keras import layers
 from sklearn.model_selection import train_test_split
 
 from mia.estimators import ShadowModelBundle, AttackModelBundle, prepare_attack_data
+import pickle
 
+import datetime
+nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
 
 NUM_CLASSES = 10
 WIDTH = 32
@@ -108,10 +111,13 @@ def demo(argv):
     # Train the target model.
     print("Training the target model...")
     target_model = target_model_fn()
-    target_model.fit(
-        X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.85, verbose=True,batch_size=BATCH_SIZE
-    )
-
+    if(train_target_model==True):
+        target_model.fit(
+            X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.85, verbose=True,batch_size=BATCH_SIZE
+        )
+        target_model.save_weights('.target_model'+nowTime)
+    else
+        target_model.save_weights(target_model_filename)
     # Train the shadow models.
     smb = ShadowModelBundle(
         target_model_fn,
@@ -143,7 +149,7 @@ def demo(argv):
     # Fit the attack models.
     print("Training the attack models...")
     amb.fit(
-        X_shadow, y_shadow, fit_kwargs=dict(epochs=FLAGS.attack_epochs, verbose=True)
+        X_shadow, y_shadow, fit_kwargs=dict(epochs=FLAGS.attack_epochs, verbose=True,batch_size=BATCH_SIZE)
     )
 
     # Test the success of the attack.
