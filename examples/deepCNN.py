@@ -12,25 +12,32 @@ from tensorflow.keras import layers
 from sklearn.model_selection import train_test_split
 
 from mia.estimators import ShadowModelBundle, AttackModelBundle, prepare_attack_data
+
+
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten, Activation
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, GlobalMaxPooling2D
+
+
 import pickle
 import datetime
 nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
-
 NUM_CLASSES = 10
 WIDTH = 32
 HEIGHT = 32
 CHANNELS = 3
-SHADOW_DATASET_SIZE = 8100
+SHADOW_DATASET_SIZE = 4000
 ATTACK_TEST_DATASET_SIZE = 4000
 BATCH_SIZE=128
-import os
+
 FLAGS = flags.FLAGS
 flags.DEFINE_integer(
     "target_epochs", 100, "Number of epochs to train target and shadow models."
 )
 flags.DEFINE_integer("attack_epochs", 100, "Number of epochs to train attack models.")
 flags.DEFINE_integer("num_shadows", 100, "Number of epochs to train attack models.")
-
 train_target_model=True
 target_model_filename=None
 if(train_target_model==False and os.access(target_model_filename, os.R_OK)!=True):
@@ -46,7 +53,6 @@ train_attack_model=True
 attack_model_filename=None    
 if(train_attack_model==False and os.access(attack_model_filename, os.R_OK)!=True):
     exit(1)#need to specify writable attack_model_fiename
-
 
 
 def get_data():
@@ -67,34 +73,72 @@ def target_model_fn():
     """The architecture of the target (victim) model.
 
     The attack is white-box, hence the attacker is assumed to know this architecture too."""
-
+    
     model = tf.keras.models.Sequential()
 
-    model.add(
-        layers.Conv2D(
-            32,
-            (3, 3),
-            activation="relu",
-            padding="same",
-            input_shape=(WIDTH, HEIGHT, CHANNELS),
-        )
-    )
-    model.add(layers.Conv2D(32, (3, 3), activation="relu"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-    model.add(layers.Dropout(0.25))
-
-    model.add(layers.Conv2D(64, (3, 3), activation="relu", padding="same"))
-    model.add(layers.Conv2D(64, (3, 3), activation="relu"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-    model.add(layers.Dropout(0.25))
-
-    model.add(layers.Flatten())
-
-    model.add(layers.Dense(512, activation="relu"))
-    model.add(layers.Dropout(0.5))
-
-    model.add(layers.Dense(NUM_CLASSES, activation="softmax"))
-    model.compile("adam", loss="categorical_crossentropy", metrics=["accuracy"])
+    model.add(Conv2D(32, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(32, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(32, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(48, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(48, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(80, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(80, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(80, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(80, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(80, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(128, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(128, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(128, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(128, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(Conv2D(128, (3, 3), padding='same',
+                 input_shape=(WIDTH, HEIGHT, CHANNELS)))
+    model.add(Activation('relu'))
+    model.add(GlobalMaxPooling2D())
+    model.add(Dropout(0.25))
+    
+    model.add(Dense(500))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.25))
+    model.add(Dense(NUM_CLASSES))
+    model.add(Activation('softmax'))
+    # initiate RMSprop optimizer
+    opt = tf.keras.optimizers.Adam(lr=0.0001)
+    # Let's train the model using RMSprop
+    model.compile(loss='categorical_crossentropy',
+              optimizer=opt,
+              metrics=['accuracy'])
 
     return model
 
@@ -119,6 +163,7 @@ def attack_model_fn():
     return model
 
 
+
 def demo(argv):
     del argv  # Unused.
 
@@ -130,10 +175,10 @@ def demo(argv):
     if(train_target_model==True):
         print("Training the target model...")
         target_model.fit(
-            X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.85, verbose=True,batch_size=BATCH_SIZE
+            X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.5, verbose=True,batch_size=BATCH_SIZE
         )
         target_model.save_weights('.target_model'+nowTime)
-    else:
+    else
         print("load target model...")
         target_model.load_weights(target_model_filename)
     # Train the shadow models.
@@ -167,7 +212,7 @@ def demo(argv):
         output = open('y_shadow'+nowTime, 'wb')
         pickle.dump(y_shadow, output,-1)
         output.close()
-    else:
+    else
         print("load shadow model result...")
         output = open(X_shadow_filename, 'rb')
         X_shadow=pickle.load(output)
@@ -189,7 +234,7 @@ def demo(argv):
         output=open('amb'+nowTime, 'wb')
         pickle.dump(amb,output,-1)
         output.close()
-    else:
+    else
         print("loading the attack models...")
         output = open(attack_model_filename, 'rb')
         amb=pickle.load(output)
