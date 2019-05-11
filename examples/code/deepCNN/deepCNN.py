@@ -60,7 +60,7 @@ def get_data():
     x_test=np.append(x_test,x_train[21000:50000],axis=0)
     y_test=np.append(y_test,y_train[21000:50000],axis=0)
     x_train=np.delete(x_train,range(21000,50000),0)
-    x_train=np.delete(y_train,range(21000,50000),0)
+    y_train=np.delete(y_train,range(21000,50000),0)
     y_train = tf.keras.utils.to_categorical(y_train)
     y_test = tf.keras.utils.to_categorical(y_test)
     x_train = x_train.astype("float32")
