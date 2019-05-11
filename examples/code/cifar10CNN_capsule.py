@@ -229,7 +229,7 @@ def demo(argv):
     print("Training the target model...")
     target_model = target_model_fn()
     target_model.fit(
-        X_train, y_train, batch_size=128, epochs=FLAGS.target_epochs, validation_split=0.5, shuffle=True
+        X_train, y_train, batch_size=128, epochs=FLAGS.target_epochs, validation_split=0.5, shuffle=True,verbose=True
     )
     #target_model.fit(
     #    X_train, y_train, batch_size=128, epochs=FLAGS.target_epochs, validation_data=(X_test, y_test), shuffle=True
