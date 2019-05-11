@@ -178,7 +178,7 @@ def demo(argv):
             X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.5, verbose=True,batch_size=BATCH_SIZE
         )
         target_model.save_weights('.target_model'+nowTime)
-    else
+    else:
         print("load target model...")
         target_model.load_weights(target_model_filename)
     # Train the shadow models.
@@ -212,7 +212,7 @@ def demo(argv):
         output = open('y_shadow'+nowTime, 'wb')
         pickle.dump(y_shadow, output,-1)
         output.close()
-    else
+    else:
         print("load shadow model result...")
         output = open(X_shadow_filename, 'rb')
         X_shadow=pickle.load(output)
@@ -234,7 +234,7 @@ def demo(argv):
         output=open('amb'+nowTime, 'wb')
         pickle.dump(amb,output,-1)
         output.close()
-    else
+    else:
         print("loading the attack models...")
         output = open(attack_model_filename, 'rb')
         amb=pickle.load(output)
