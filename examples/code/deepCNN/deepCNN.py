@@ -28,7 +28,7 @@ NUM_CLASSES = 10
 WIDTH = 32
 HEIGHT = 32
 CHANNELS = 3
-SHADOW_DATASET_SIZE = 4000
+SHADOW_DATASET_SIZE = 18000
 ATTACK_TEST_DATASET_SIZE = 4000
 BATCH_SIZE=128
 
@@ -37,7 +37,7 @@ flags.DEFINE_integer(
     "target_epochs", 100, "Number of epochs to train target and shadow models."
 )
 flags.DEFINE_integer("attack_epochs", 100, "Number of epochs to train attack models.")
-flags.DEFINE_integer("num_shadows", 100, "Number of epochs to train attack models.")
+flags.DEFINE_integer("num_shadows", 50, "Number of epochs to train attack models.")
 train_target_model=True
 target_model_filename=None
 if(train_target_model==False and os.access(target_model_filename, os.R_OK)!=True):
@@ -54,20 +54,20 @@ attack_model_filename=None
 if(train_attack_model==False and os.access(attack_model_filename, os.R_OK)!=True):
     exit(1)#need to specify writable attack_model_fiename
 
-
 def get_data():
-    """Prepare CIFAR10 data."""
-    (X_train, y_train), (X_test, y_test) = tf.keras.datasets.cifar10.load_data()
+    
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+    x_test=np.append(x_test,x_train[21000:50000],axis=0)
+    y_test=np.append(y_test,y_train[21000:50000],axis=0)
     y_train = tf.keras.utils.to_categorical(y_train)
     y_test = tf.keras.utils.to_categorical(y_test)
-    X_train = X_train.astype("float32")
-    X_test = X_test.astype("float32")
+    x_train = x_train.astype("float32")
+    x_test = x_test.astype("float32")
     y_train = y_train.astype("float32")
     y_test = y_test.astype("float32")
-    X_train /= 255
-    X_test /= 255
-    return (X_train, y_train), (X_test, y_test)
-
+    x_train /= 255
+    x_test /= 255
+    return (x_train, y_train), (x_test, y_test)
 
 def target_model_fn():
     """The architecture of the target (victim) model.
@@ -134,7 +134,7 @@ def target_model_fn():
     model.add(Dense(NUM_CLASSES))
     model.add(Activation('softmax'))
     # initiate RMSprop optimizer
-    opt = tf.keras.optimizers.Adam(lr=0.0001)
+    opt = tf.keras.optimizers.Adam(lr=0.001)
     # Let's train the model using RMSprop
     model.compile(loss='categorical_crossentropy',
               optimizer=opt,
@@ -175,7 +175,7 @@ def demo(argv):
     if(train_target_model==True):
         print("Training the target model...")
         target_model.fit(
-            X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.5, verbose=True,batch_size=BATCH_SIZE
+            X_train, y_train, epochs=FLAGS.target_epochs, validation_split=0.142, verbose=True,batch_size=BATCH_SIZE
         )
         target_model.save_weights('.target_model'+nowTime)
     else:
@@ -190,7 +190,7 @@ def demo(argv):
 
     # We assume that attacker's data were not seen in target's training.
     attacker_X_train, attacker_X_test, attacker_y_train, attacker_y_test = train_test_split(
-        X_test, y_test, test_size=0.1
+        X_test, y_test, test_size=0.05
     )
     print(attacker_X_train.shape, attacker_X_test.shape)
 

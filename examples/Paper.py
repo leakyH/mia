@@ -31,17 +31,17 @@ flags.DEFINE_integer("num_shadows", 100, "shadow model的数量")
 
 #cifar10数据输入
 def get_data():
-   
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+    """Prepare CIFAR10 data."""
+    (X_train, y_train), (X_test, y_test) = tf.keras.datasets.cifar10.load_data()
     y_train = tf.keras.utils.to_categorical(y_train)
     y_test = tf.keras.utils.to_categorical(y_test)
-    x_train = x_train.astype("float32")
-    x_test = x_test.astype("float32")
+    X_train = X_train.astype("float32")
+    X_test = X_test.astype("float32")
     y_train = y_train.astype("float32")
     y_test = y_test.astype("float32")
-    x_train /= 255
-    x_test /= 255
-    return (x_train, y_train), (x_test, y_test)
+    X_train /= 255
+    X_test /= 255
+    return (X_train, y_train), (X_test, y_test)
 
 #目标所用模型
 def target_model_fn():
