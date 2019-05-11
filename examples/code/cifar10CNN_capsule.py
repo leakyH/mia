@@ -29,10 +29,10 @@ ATTACK_TEST_DATASET_SIZE = 4000
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer(
-    "target_epochs", 50, "Number of epochs to train target and shadow models."
+    "target_epochs", 10, "Number of epochs to train target and shadow models."
 )
-flags.DEFINE_integer("attack_epochs", 50, "Number of epochs to train attack models.")
-flags.DEFINE_integer("num_shadows", 10, "Number of epochs to train attack models.")
+flags.DEFINE_integer("attack_epochs", 10, "Number of epochs to train attack models.")
+flags.DEFINE_integer("num_shadows", 3, "Number of epochs to train attack models.")
 
 def squash(x, axis=-1):
     """The Squashing Function.
