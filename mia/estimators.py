@@ -100,7 +100,7 @@ class ShadowModelBundle(sklearn.base.BaseEstimator):
         for i in self._get_model_iterator(verbose=verbose):
             # Pick indices for this shadow model.
             shadow_indices = self._prng.choice(
-                indices,  self.shadow_dataset_size*10/9, replace=False
+                indices,  int(self.shadow_dataset_size*10/9), replace=False
             )
             train_indices = shadow_indices[: self.shadow_dataset_size]
             test_indices = shadow_indices[self.shadow_dataset_size :]
@@ -142,7 +142,6 @@ class ShadowModelBundle(sklearn.base.BaseEstimator):
         )
 
         for i in model_index_iter:
-            print("i=",i)
             shadow_model = self._get_model(i)
             train_indices = self.shadow_train_indices_[i]
             test_indices = self.shadow_test_indices_[i]
